@@ -103,6 +103,23 @@ pipeline {
                 archiveArtifacts artifacts: 'artifacts/metrics.json', allowEmptyArchive: true
             }
         }
+
+        stage('Push to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub',
+                                                  usernameVariable: 'DH_USER',
+                                                  passwordVariable: 'DH_TOKEN')]) {
+                    sh '''
+                        echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
+                        docker tag "$IMAGE:$BUILD_NUMBER" "$DH_USER/$IMAGE:$BUILD_NUMBER"
+                        docker tag "$IMAGE:$BUILD_NUMBER" "$DH_USER/$IMAGE:latest"
+                        docker push "$DH_USER/$IMAGE:$BUILD_NUMBER"
+                        docker push "$DH_USER/$IMAGE:latest"
+                        docker logout
+                    '''
+                }
+            }
+        }
     }
 
     post {
