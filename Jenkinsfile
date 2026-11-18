@@ -19,6 +19,7 @@ pipeline {
         STUDENT_ID = 'FA23-BCT-059'
         NOTIFY_TO  = 'qasimalik@gmail.com'
         IMAGE      = 'midterm-fa23-bct-059'
+        DOCKERHUB_REPO = 'zaynisop/midterm-fa23-bct-059'
         CONTAINER  = 'midterm-app'
         APP_PORT   = '8000'
         VENV       = "${env.JENKINS_HOME}/venvs/midterm-fa23-bct-059"
@@ -105,19 +106,14 @@ pipeline {
         }
 
         stage('Push to DockerHub') {
+            // Uses the jenkins user's `docker login` (access token stored once on the EC2 host)
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub',
-                                                  usernameVariable: 'DH_USER',
-                                                  passwordVariable: 'DH_TOKEN')]) {
-                    sh '''
-                        echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
-                        docker tag "$IMAGE:$BUILD_NUMBER" "$DH_USER/$IMAGE:$BUILD_NUMBER"
-                        docker tag "$IMAGE:$BUILD_NUMBER" "$DH_USER/$IMAGE:latest"
-                        docker push "$DH_USER/$IMAGE:$BUILD_NUMBER"
-                        docker push "$DH_USER/$IMAGE:latest"
-                        docker logout
-                    '''
-                }
+                sh '''
+                    docker tag "$IMAGE:$BUILD_NUMBER" "$DOCKERHUB_REPO:$BUILD_NUMBER"
+                    docker tag "$IMAGE:$BUILD_NUMBER" "$DOCKERHUB_REPO:latest"
+                    docker push "$DOCKERHUB_REPO:$BUILD_NUMBER"
+                    docker push "$DOCKERHUB_REPO:latest"
+                '''
             }
         }
     }
