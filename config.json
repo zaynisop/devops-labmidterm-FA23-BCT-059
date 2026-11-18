@@ -1,0 +1,20 @@
+{
+  "student_id": "FA23-BCT-059",
+  "scenario": "cloud_host",
+  "seed": 24574,
+  "features": [
+    "cpu_usage",
+    "memory_pressure",
+    "disk_io",
+    "request_rate"
+  ],
+  "weights": [
+    0.95,
+    0.85,
+    0.6,
+    0.8
+  ],
+  "variant": "rounded",
+  "bias": 0.0,
+  "offset": 0.27
+}
